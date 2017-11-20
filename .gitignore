@@ -2,5 +2,3 @@
 __pycache__/
 .ipynb_checkpoints/
 *-checkpoints.ipynb
-*.cpython-36.pyc
-*.pyc
