@@ -1,4 +1,5 @@
 import pandas as pd
+import time
 
 
 class HotpotFund:
@@ -41,16 +42,25 @@ class HotpotFund:
     def get_labels(self):
         labels_string_list = []
         for index, label in self.labels.items():
-            labels_string_list.append(":".join([str(index), label.name]))
+            if label.parent != None:
+                labels_string_list.append(":".join([str(index), label.name]))
         return labels_string_list
 
     def creat_new_label(self, index):
         name = input("Type the name of label")
-        parent_index = int(input("Type the parent index of label"))
+        parent_index = int(input("Type the parent index of label\n"))
         while parent_index not in self.labels.keys() and parent_index != index:
-            parent_index = int(input("Type the parent index of label"))
+            parent_index = int(input("Type the parent index of label\n"))
         self.labels[index] = Label(
             index, name, None if parent_index == index else self.labels[parent_index])
+
+    def start_fund(self):
+        selected_label_index = input(
+            "Select the index:\n" + '\n'.join(self.get_labels()) + "\n")
+        if int(selected_label_index) not in self.labels.keys():
+            self.creat_new_label(selected_label_index)
+        self.start_time = time.time()
+        self.stop_time = time.time()
 
 
 class Label:
