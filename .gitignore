@@ -1,0 +1,6 @@
+# Ipython files
+__pycache__/
+.ipynb_checkpoints/
+*-checkpoints.ipynb
+*.cpython-36.pyc
+*.pyc
