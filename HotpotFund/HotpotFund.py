@@ -8,19 +8,20 @@ class HotpotFund:
         self.record_name = record_name
         self.label_name = label_name
         self.benchmark_path = benchmark_path
-        records = self.read_file(
-            benchmark_path, record_name, csv_delimiter)
-        labels = self.read_file(
-            benchmark_path, label_name, csv_delimiter)
-        self.records = self.read_records(records)
-        self.labels = self.read_labels(labels)
+        self.records = self.read_records(
+            benchmark_path + record_name, csv_delimiter)
+        self.labels = self.read_labels(
+            benchmark_path + label_name, csv_delimiter)
 
-    def read_records(self, record_df):
-        records = {}
+    def read_records(self, record_path, csv_delimiter):
+        record_df = self.read_file(record_path, csv_delimiter)
+        records = None
         if not record_df.empty:
             records = record_df
+        return records
 
-    def read_labels(self, labels_df):
+    def read_labels(self, label_paht, csv_delimiter):
+        labels_df = self.read_file(label_paht, csv_delimiter)
         labels = {}
         # label_info=[index,parent_index,name]
         if not labels_df.empty:
@@ -34,22 +35,21 @@ class HotpotFund:
                         label_info[0], label_info[2], labels[label_info[1]])
         return labels
 
-    def read_file(self, benchmark_path, file_name, csv_delimiter):
-        file_path = benchmark_path + file_name
+    def read_file(self, file_path, csv_delimiter):
         try:
             file_df = pd.read_csv(file_path, sep=csv_delimiter)
             return file_df
         except IOError:
             print("no such file " + file_path)
-            print("creating file %s" % (file_name))
+            print("creating file %s" % (file_path))
             # create a new file to store contents
             header = ""
-            if file_name == "record.csv":
+            if file_path.endswith("record.csv"):
                 header = "start,stop,index\n"
-            elif file_name == "label.csv":
+            elif file_path.endswith("label.csv"):
                 header = "index,parent_index,name,display\n"
             write_file(file_path, header)
-            print("created file %s" % (file_name))
+            print("created file %s" % (file_path))
             return pd.DataFrame(None)
 
     def get_labels(self):
@@ -86,8 +86,8 @@ class HotpotFund:
         self.stop_time = time.time()
         self.write_file(self.benchmark_path + self.record_name,
                         ",".join([str(self.start_time), str(self.stop_time), str(self.selected_label_index)]) + "\n")
-        print("Spend %s on %s" % (time.strftime("%H:%M:%S",
-                                                time.gmtime(self.stop_time - self.start_time)), self.labels[self.selected_label_index].name))
+        print("Spend %s on %s" % (self.format_time_difference(
+            self.start_time, self.stop_time), self.labels[self.selected_label_index].name))
 
     def write_file(self, file_path, csv_lines):
         if os.path.exists(file_path):
@@ -103,6 +103,11 @@ class HotpotFund:
             # print(csv_lines)
         file.close()
 
+    def format_time_difference(start, stop):
+        return time.strftime("%H:%M:%S", time.gmtime(self.stop - start))
+
+    def show_records(self):
+        print(self.records)
 
 class Label:
     def __init__(self, index, name, parent):
