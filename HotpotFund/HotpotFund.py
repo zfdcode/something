@@ -41,6 +41,15 @@ class HotpotFund:
             return file_df
         except IOError:
             print("no such file " + file_path)
+            print("creating file %s" % (file_name))
+            # create a new file to store contents
+            header = ""
+            if file_name == "record.csv":
+                header = "start,stop,index\n"
+            elif file_name == "label.csv":
+                header = "index,parent_index,name,display\n"
+            write_file(file_path, header)
+            print("created file %s" % (file_name))
             return pd.DataFrame(None)
 
     def get_labels(self):
@@ -77,6 +86,8 @@ class HotpotFund:
         self.stop_time = time.time()
         self.write_file(self.benchmark_path + self.record_name,
                         ",".join([str(self.start_time), str(self.stop_time), str(self.selected_label_index)]) + "\n")
+        print("Spend %s on %s" % (time.strftime("%H:%M:%S",
+                                                time.gmtime(self.stop_time - self.start_time)), self.labels[self.selected_label_index].name))
 
     def write_file(self, file_path, csv_lines):
         if os.path.exists(file_path):
@@ -89,7 +100,7 @@ class HotpotFund:
                 file.write(csv_line)
         else:
             file.write(csv_lines)
-            print(csv_lines)
+            # print(csv_lines)
         file.close()
 
 
