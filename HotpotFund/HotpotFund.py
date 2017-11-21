@@ -87,7 +87,7 @@ class HotpotFund:
         self.write_file(self.benchmark_path + self.record_name,
                         ",".join([str(self.start_time), str(self.stop_time), str(self.selected_label_index)]) + "\n")
         print("Spend %s on %s" % (self.format_time_difference(
-            self.start_time, self.stop_time), self.labels[self.selected_label_index].name))
+            self.start_time - self.stop_time), self.labels[self.selected_label_index].name))
 
     def write_file(self, file_path, csv_lines):
         if os.path.exists(file_path):
@@ -103,14 +103,28 @@ class HotpotFund:
             # print(csv_lines)
         file.close()
 
-    def format_time_difference(start, stop):
-        return time.strftime("%H:%M:%S", time.gmtime(self.stop - start))
+    def format_time_difference(self, time_difference):
+        return time.strftime("%H:%M:%S", time.gmtime(time_difference))
+
+    def format_date(self,date):
+        return time.strftime("%Y.%m.%d", time.gmtime(date))
 
     def show_records(self):
-        print(self.records)
+        time_series = (
+            self.records["stop"] - self.records["start"]).map(self.format_time_difference)
+        name_series = self.records["index"].map(self.find_label_name)
+        date_series = self.records["start"].map(self.format_date)
+        return pd.DataFrame([date_series.rename("date"),name_series.rename("name"), time_series.rename("time")]).T
+
+    def find_label_name(self, label_index):
+        if label_index in self.labels:
+            return self.labels[label_index].name
+        else:
+            return "Label index does not exist!"
+
 
 class Label:
     def __init__(self, index, name, parent):
-        self.index = index
-        self.name = name
-        self.parent = parent
+        self.index=index
+        self.name=name
+        self.parent=parent
