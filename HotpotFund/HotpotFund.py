@@ -122,6 +122,9 @@ class HotpotFund:
         else:
             return "Label index does not exist!"
 
+    def add_record(self,start,stop):
+        return None
+
 
 class Label:
     def __init__(self, index, name, parent):
