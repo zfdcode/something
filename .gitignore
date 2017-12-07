@@ -2,3 +2,7 @@
 __pycache__/
 .ipynb_checkpoints/
 *-checkpoints.ipynb
+
+#
+.log
+.xlsm
