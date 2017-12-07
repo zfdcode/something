@@ -4,6 +4,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib import cm as cm
 from gurobipy import *
+from sklearn import linear_model
 
 
 class CIOGame:
@@ -61,22 +62,25 @@ class CIOGame:
             "Interest Rate Customer Savings"
         ]]
 
-        return pd.concat([
+        df_cmo = pd.concat([
             df_management_overview,
             df_balanced_score_card,
             df_resource_management
         ])
+        df_cmo.columns = df_cmo.columns.astype(
+            int)
+        return df_cmo.astype(float)
 
-    def find_best_regr(self, X, y, df_pre, y_pre):
+    def find_best_regr(self, X, y, df_pre, y_pre=0):
         diff = []
         regr_list = []
         data_size = len(y)
         # train the regrs
-        for i in range(data_size):
-            a = list(range(data_size))
-            del a[i]
-            X_train = X.iloc[a]
-            X_test = X.iloc[i].values.reshape(1, -1)
+        for i in X.index:
+            a = X.index.tolist()
+            a.remove(i)
+            X_train = X.loc[a]
+            X_test = X.loc[i].values.reshape(1, -1)
             y_train = y[a]
             y_test = y[i]
 
@@ -90,9 +94,11 @@ class CIOGame:
         best_regr_index = list_diff.index(min(list_diff))
         best_regr = regr_list[best_regr_index]
 
-        print(list_diff[best_regr_index])
+        print(list_diff)
         print(y_pre)
-        print(best_regr.predict(df_pre)[0])
+        print(best_regr.predict(df_pre.values.reshape(1, -1))[0])
+        print(pd.DataFrame(list(zip(X.columns, best_regr.coef_)),
+                           columns=['features', 'estimatedCoefficients']))
 
         return best_regr
 
