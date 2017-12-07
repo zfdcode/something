@@ -32,6 +32,7 @@ class CIOGame:
             "Service Transactions succeeded loans",
             "Requests to be processed savings",
             "Contracts succeeded savings",
+            "Service Transactions to be processed savings",
             "Service Transactions succeeded savings"
         ]]
         df_management_overview.columns = df_management_overview.columns.astype(
@@ -112,7 +113,7 @@ class CIOGame:
         m.setObjective(global_exp + saving_exp + loan_exp, GRB.MINIMIZE)
         # add constrs
         m.addConstr(global_exp * best_regr_loans.coef_[
-                    0] + loan_exp * best_regr_loans.coef_[1] >= goal_loans, "loans_ta")
+                    1] + loan_exp * best_regr_loans.coef_[2] >= goal_loans, "loans_ta")
         m.addConstr(global_exp * best_regr_savings.coef_[
                     0] + saving_exp * best_regr_savings.coef_[1] >= goal_savings, "savings_ta")
         # fire!
